@@ -117,5 +117,8 @@ app.get('/orders/amounts', middleware.checkAuthenticated, middleware.checkAdmin,
 // Search products (renders search.ejs)
 app.get('/search', middleware.checkAuthenticated, ProductController.search);
 
+// View Purchase History for User
+app.get('/viewPhUser', middleware.checkAuthenticated, OrderController.userHistory);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
