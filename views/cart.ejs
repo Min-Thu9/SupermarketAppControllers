@@ -4,129 +4,189 @@
   <meta charset="UTF-8">
   <title>Your Cart</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     body {
       background-color: #f8f9fa;
     }
-    .cart-header {
-      border-bottom: 2px solid #dee2e6;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
+    .page-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 30px;
     }
     .table thead {
-      background-color: #343a40;
-      color: white;
+      background-color: #212529;
+      color: #fff;
     }
     .table tbody tr:hover {
       background-color: #f1f3f5;
     }
     .btn-update {
-      margin-top: 5px;
+      margin-top: 6px;
+      width: 100%;
     }
     .cart-actions {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
     }
+    .navbar-brand { letter-spacing: 0.4px; }
   </style>
 </head>
+
 <body>
 
-    <nav class="navbar navbar-expand-sm bg-dark navbar-dark shadow-sm">
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark shadow-sm">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold" href="/">Supermarket App</a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav ms-auto">
+
           <li class="nav-item">
             <a class="nav-link" href="/search">Search</a>
           </li>
-          <li>
-          <form class="d-flex" method="GET" action="/search">
-            <input class="form-control me-2" type="text" name="q" placeholder="Search by name" required>
-            <button class="btn btn-primary" type="submit">Search</button>
-          </form>
+
+          <li class="nav-item d-flex align-items-center">
+            <form class="d-flex" method="GET" action="/search">
+              <input class="form-control me-2" type="text" name="q" placeholder="Search by name" required>
+              <button class="btn btn-primary" type="submit">Go</button>
+            </form>
           </li>
+
           <li class="nav-item">
             <a class="nav-link" href="/cart">🛒 View Cart</a>
           </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/viewPhUser">Purchase History</a>
+          </li>
+
           <li class="nav-item">
             <a class="nav-link" href="/logout">Logout</a>
           </li>
+
         </ul>
       </div>
     </div>
   </nav>
-  
+
+  <!-- MAIN CONTENT -->
   <main class="container my-5">
-    <h2 class="cart-header">Shopping Cart</h2>
+    <div class="page-card">
+      <h2 class="cart-header fw-bold">Shopping Cart</h2>
 
-    <% if (messages && messages.length > 0) { %>
-      <div class="alert alert-danger">
-        <% messages.forEach(function(msg) { %>
-          <p class="mb-1"><%= msg %></p>
-        <% }); %>
-      </div>
-    <% } %>
+      <!-- Messages -->
+      <% if (messages && messages.length > 0) { %>
+        <div class="alert alert-danger">
+          <% messages.forEach(function(msg) { %>
+            <p class="mb-1"><%= msg %></p>
+          <% }); %>
+        </div>
+      <% } %>
 
-    <% if (cart.length === 0) { %>
-      <div class="text-center py-5">
-        <p class="fs-5">Your cart is empty.</p>
-        <a href="/shopping" class="btn btn-primary">Continue Shopping</a>
-      </div>
-    <% } else { %>
-      <div class="table-responsive">
-        <table class="table table-bordered align-middle text-center">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Total</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% let grandTotal = 0; cart.forEach(item => { 
-                 const total = item.price * item.cartQuantity;
-                 grandTotal += total;
-            %>
+      <!-- EMPTY CART -->
+      <% if (cart.length === 0) { %>
+        <div class="text-center py-5">
+          <p class="fs-5">Your cart is empty.</p>
+          <a href="/shopping" class="btn btn-primary">Continue Shopping</a>
+        </div>
+
+      <% } else { %>
+
+        <!-- CART TABLE -->
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle text-center">
+
+            <thead>
               <tr>
-                <td class="text-start"><%= item.productName %></td>
+                <th>Product</th>
+                <th width="180">Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% 
+                let grandTotal = 0; 
+                cart.forEach(item => { 
+                  const total = item.price * item.cartQuantity; 
+                  grandTotal += total;
+              %>
+
+              <tr>
+                <td class="text-start fw-semibold"><%= item.productName %></td>
+
                 <td>
                   <form action="/cart/update/<%= item.cartId %>" method="POST" class="d-flex flex-column align-items-center">
-                    <input type="number" name="quantity" value="<%= item.cartQuantity %>" min="1" max="<%= item.productStock %>" class="form-control w-50">
-                    <button type="submit" class="btn btn-sm btn-success btn-update">Update</button>
+                    <input
+                      type="number"
+                      name="quantity"
+                      value="<%= item.cartQuantity %>"
+                      min="1"
+                      max="<%= item.productStock %>"
+                      class="form-control w-75 text-center"
+                    >
+
+                    <button type="submit" class="btn btn-sm btn-success btn-update">
+                      Update
+                    </button>
                   </form>
-                  <div class="small text-muted mt-1">Stock: <%= item.productStock %></div>
+
+                  <div class="small text-muted mt-1">
+                    Stock: <%= item.productStock %>
+                  </div>
                 </td>
+
                 <td>$<%= item.price.toFixed(2) %></td>
                 <td>$<%= total.toFixed(2) %></td>
+
                 <td>
-                  <a href="/cart/remove/<%= item.cartId %>" class="btn btn-sm btn-danger">Remove</a>
+                  <a href="/cart/remove/<%= item.cartId %>" class="btn btn-sm btn-danger">
+                    Remove
+                  </a>
                 </td>
               </tr>
-            <% }) %>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colspan="3" class="text-end"><strong>Grand Total</strong></td>
-              <td colspan="2"><strong>$<%= grandTotal.toFixed(2) %></strong></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
 
-      <div class="cart-actions mt-4">
-        <a href="/shopping" class="btn btn-outline-secondary">Continue Shopping</a>
-        <a href="/cart/clear" class="btn btn-outline-danger">Clear Cart</a>
-        <form action="/checkout" method="POST" class="d-inline">
-          <button type="submit" class="btn btn-success">Proceed to Checkout</button>
-        </form>
-      </div>
-    <% } %>
+              <% }) %>
+            </tbody>
+
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-end"><strong>Grand Total</strong></td>
+                <td colspan="2" class="fw-bold">$<%= grandTotal.toFixed(2) %></td>
+              </tr>
+            </tfoot>
+
+          </table>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="cart-actions mt-4">
+          <a href="/shopping" class="btn btn-outline-secondary">Continue Shopping</a>
+          <a href="/cart/clear" class="btn btn-outline-danger">Clear Cart</a>
+
+          <form action="/checkout" method="POST">
+            <button type="submit" class="btn btn-success">
+              Proceed to Checkout
+            </button>
+          </form>
+        </div>
+
+      <% } %>
+
+    </div>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
